@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import styles from "./index.module.css";
 
-type RangeSliderProps = {
+type SliderProps = {
   start: number;
   end: number;
   onChange: (data: { min: number; max: number }) => void;
@@ -11,21 +11,12 @@ type RangeSliderProps = {
   min: number;
   max: number;
 };
-export function RangeSlider({
-  start,
-  end,
-  onChange,
-  color,
-  min,
-  max,
-}: RangeSliderProps) {
+export function Slider({ start, end, onChange, color, min, max }: SliderProps) {
   const [minVal, setMinVal] = useState(min);
   const [maxVal, setMaxVal] = useState(max);
   const minValRef = useRef<any>(null); // TODO: ts
   const maxValRef = useRef<any>(null); // TODO: ts
   const range = useRef<any>(null); // TODO: ts
-
-  console.log(minVal);
 
   // Convert to percentage
   const getPercent = useCallback(
@@ -77,13 +68,9 @@ export function RangeSlider({
           setMinVal(value);
           event.target.value = value.toString();
         }}
-        // className={classnames("thumb thumb--zindex-3", {
-        //   "thumb--zindex-5": minVal > max - 100
-        // })}
         className={classnames(styles.thumb, styles.zIndex3, {
           [styles.zIndex5]: minVal > end - 100,
         })}
-        // className={styles.}
       />
       <input
         type="range"
@@ -97,7 +84,6 @@ export function RangeSlider({
           setMaxVal(value);
           event.target.value = value.toString();
         }}
-        // className="thumb thumb--zindex-4"
         className={classnames(styles.thumb, styles.zIndex4)}
       />
 
@@ -109,9 +95,10 @@ export function RangeSlider({
           style={{
             background: color,
           }}
-        />
-        <div className={styles.valueStart}>{minVal}</div>
-        <div className={styles.valueEnd}>{maxVal}</div>
+        >
+          <div className={styles.valueStart}>{minVal}</div>
+          <div className={styles.valueEnd}>{maxVal}</div>
+        </div>
       </div>
     </div>
   );

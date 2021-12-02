@@ -1,0 +1,12 @@
+.container {
+  position: relative;
+  background-color: white;
+  height: 100px;
+  width: 1000px;
+}
+
+.slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
