@@ -188,7 +188,6 @@ export function Timeline({ start, end, sections }: TimelineProps) {
         );
       }
     }
-    // console.log(min, max, moveType, handleKind, sectionIdx, shiftIdx);
   };
 
   return (

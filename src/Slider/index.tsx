@@ -48,36 +48,44 @@ export function Slider({
     [start, end]
   );
 
-  // Set width of the range to decrease from the left side
-  useEffect(() => {
-    if (maxValRef.current) {
-      const minPercent = getPercent(state.min);
-      const maxPercent = getPercent(+maxValRef.current.value); // Preceding with '+' converts the value from type string to type number
+  const onChangeMin = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = Math.min(+event.target.value, state.max - 1);
+      if (value < constraintMin) return;
+      setState({
+        ...state,
+        moveType: state.min < value ? "INCREASE" : "DECREASE",
+        handleKind: "MIN",
+        min: value,
+      });
+      event.target.value = value.toString();
+    },
+    [state, constraintMin]
+  );
 
-      if (range.current) {
-        range.current.style.left = `${minPercent}%`;
-        range.current.style.width = `${maxPercent - minPercent}%`;
-      }
-    }
-  }, [state.min, getPercent]);
-
-  // Set width of the range to decrease from the right side
-  useEffect(() => {
-    if (minValRef.current) {
-      const minPercent = getPercent(+minValRef.current.value);
-      const maxPercent = getPercent(state.max);
-
-      if (range.current) {
-        range.current.style.width = `${maxPercent - minPercent}%`;
-      }
-    }
-  }, [state.max, getPercent]);
+  const onChangeMax = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = Math.max(+event.target.value, state.min + 1);
+      if (value > constraintMax) return;
+      setState({
+        ...state,
+        moveType: state.max < value ? "INCREASE" : "DECREASE",
+        handleKind: "MAX",
+        max: value,
+      });
+      event.target.value = value.toString();
+    },
+    [state, constraintMax]
+  );
 
   // Get min and max values when their state changes
   useEffect(() => {
     onChange(state);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
+
+  const minPercent = getPercent(state.min);
+  const maxPercent = getPercent(state.max);
 
   return (
     <div className={styles.container}>
@@ -87,17 +95,7 @@ export function Slider({
         max={end}
         value={state.min}
         ref={minValRef}
-        onChange={event => {
-          const value = Math.min(+event.target.value, state.max - 1);
-          if (value < constraintMin) return;
-          setState({
-            ...state,
-            moveType: state.min < value ? "INCREASE" : "DECREASE",
-            handleKind: "MIN",
-            min: value,
-          });
-          event.target.value = value.toString();
-        }}
+        onChange={onChangeMin}
         className={classnames(styles.thumb, styles.zIndex3, {
           [styles.zIndex5]: state.min > end - 100,
         })}
@@ -108,17 +106,7 @@ export function Slider({
         max={end}
         value={state.max}
         ref={maxValRef}
-        onChange={event => {
-          const value = Math.max(+event.target.value, state.min + 1);
-          if (value > constraintMax) return;
-          setState({
-            ...state,
-            moveType: state.max < value ? "INCREASE" : "DECREASE",
-            handleKind: "MAX",
-            max: value,
-          });
-          event.target.value = value.toString();
-        }}
+        onChange={onChangeMax}
         className={classnames(styles.thumb, styles.zIndex4)}
       />
 
@@ -129,6 +117,8 @@ export function Slider({
           className={styles.range}
           style={{
             background: color,
+            left: `${minPercent}%`,
+            width: `${maxPercent - minPercent}%`,
           }}
         >
           <div className={styles.valueStart}>
