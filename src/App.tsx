@@ -15,18 +15,18 @@ function App() {
             min: 0,
             max: 500,
             shifts: [
-              [0, 100],
-              [90, 300],
+              [0, 100], // il peut aller de 0 à 199
+              [200, 300], // il peut aller de 101 à 399
             ],
           },
           {
             name: "mardi",
             color: "blue",
-            min: 501,
-            max: 1000,
+            min: 200,
+            max: 900,
             shifts: [
-              [500, 700],
-              [701, 1000],
+              [400, 500], // il peut aller de 301 à 599
+              [600, 700], // il peut aller de 501 à 700
             ],
           },
         ]}
