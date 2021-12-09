@@ -21,6 +21,7 @@ type SliderProps = {
   max: number;
   constraintMin: number;
   constraintMax: number;
+  onPressAdd?: (() => void) | null;
 };
 
 export function Slider({
@@ -32,6 +33,7 @@ export function Slider({
   max,
   constraintMin,
   constraintMax,
+  onPressAdd,
 }: SliderProps) {
   const [state, setState] = useState<SliderState>({
     min,
@@ -127,6 +129,9 @@ export function Slider({
           <div className={styles.valueEnd}>
             {state.max} max: ({constraintMax})
           </div>
+          {onPressAdd && state.max < constraintMax && (
+            <div className={styles.addRangeBtn} onClick={onPressAdd} />
+          )}
         </div>
       </div>
     </div>

@@ -4,10 +4,16 @@ import "./App.css";
 
 function App() {
   return (
-    <div style={{ marginTop: 200 }}>
+    <div
+      style={{
+        display: "flex",
+        height: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       <Timeline
-        start={0}
-        end={1000}
+        duration={1000}
         sections={[
           {
             name: "lundi",
