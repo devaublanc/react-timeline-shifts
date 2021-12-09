@@ -46,21 +46,19 @@ export function Slider({
 
   // Convert to percentage
   const getPercent = useCallback(
-    value => Math.round(((value - start) / (end - start)) * 100),
+    value => ((value - start) / (end - start) * 100),
     [start, end]
   );
 
   const onChangeMin = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = Math.min(+event.target.value, state.max - 1);
-      if (value < constraintMin) return;
       setState({
         ...state,
         moveType: state.min < value ? "INCREASE" : "DECREASE",
         handleKind: "MIN",
-        min: value,
+        min: value < constraintMin ? constraintMin : value,
       });
-      event.target.value = value.toString();
     },
     [state, constraintMin]
   );
@@ -68,14 +66,12 @@ export function Slider({
   const onChangeMax = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = Math.max(+event.target.value, state.min + 1);
-      if (value > constraintMax) return;
       setState({
         ...state,
         moveType: state.max < value ? "INCREASE" : "DECREASE",
         handleKind: "MAX",
-        max: value,
+        max: value > constraintMax ? constraintMax : value,
       });
-      event.target.value = value.toString();
     },
     [state, constraintMax]
   );
