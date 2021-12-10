@@ -17,14 +17,14 @@
 .day {
   flex: 1;
   width: 100%;
-  border-right: inset 1px rgb(133, 133, 133); 
+  border-right: dashed 1px rgb(133, 133, 133);
   display: flex;
   flex-direction: column;
 }
 
 .title {
-  margin-left: 10px;
-  margin-bottom: 10px;
+  margin-left: 5px;
+  margin-bottom: 20px;
   margin-top: 5px;
 }
 
@@ -33,12 +33,20 @@
   height: 100%;
   display: flex;
   align-items: stretch;
+  position: relative;
+}
+
+.step {
+  position: absolute;
+  font-size: 8px;
+  top: -10px;
+  transform: translateX(-50%);
 }
 
 .hour {
   flex: 1;
   width: 100%;
-  border-right: 1px rgb(185, 185, 185) solid;
+  border-right: 1px rgb(228, 228, 228) solid;
 }
 
 .hour:last-child {
@@ -47,7 +55,7 @@
 
 .timeline {
   position: absolute;
-  top: 50px;
+  top: 65px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
