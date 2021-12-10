@@ -46,7 +46,7 @@ export function Slider({
 
   // Convert to percentage
   const getPercent = useCallback(
-    value => ((value - start) / (end - start) * 100),
+    value => ((value - start) / (end - start)) * 100,
     [start, end]
   );
 
@@ -122,6 +122,7 @@ export function Slider({
           <div className={styles.valueStart}>
             {state.min} (min: {constraintMin})
           </div>
+
           <div className={styles.valueEnd}>
             {state.max} max: ({constraintMax})
           </div>
