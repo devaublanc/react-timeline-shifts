@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Slider, SliderState } from "../Slider";
 import produce from "immer";
 
@@ -14,9 +14,10 @@ type TimelineProps = {
     max?: number;
     shifts: number[][];
   }[];
+  onChange?: (sections: number[][][]) => void;
 };
 
-export function Timeline({ duration, sections }: TimelineProps) {
+export function Timeline({ duration, sections, onChange }: TimelineProps) {
   const [sectionsState, updateSectionsState] = useState(
     sections.map(s => s.shifts)
   );
@@ -52,23 +53,21 @@ export function Timeline({ duration, sections }: TimelineProps) {
 
     // if this is the min handle that has been updated
     if (handleKind === "MIN") {
-      // if the current shift is the first entry from its section
       if (
+        // if the current shift is the first entry from its section
         sectionsState[sectionIdx].indexOf(
           sectionsState[sectionIdx][shiftIdx]
-        ) === 0
-      ) {
+        ) === 0 &&
         // If there is a shift in the previous section
-        if (sectionsState[sectionIdx - 1]) {
-          // look at the max of the last shift from the previous section and set its max with the sliderState.min - 1
-
-          updateSectionsState(
-            produce(draft => {
-              // update the current
-              draft[sectionIdx][shiftIdx][0] = min;
-            })
-          );
-        }
+        sectionsState[sectionIdx - 1]
+      ) {
+        // look at the max of the last shift from the previous section and set its max with the sliderState.min - 1
+        updateSectionsState(
+          produce(draft => {
+            // update the current
+            draft[sectionIdx][shiftIdx][0] = min;
+          })
+        );
       } else {
         updateSectionsState(
           produce(draft => {
@@ -80,28 +79,24 @@ export function Timeline({ duration, sections }: TimelineProps) {
     }
 
     if (handleKind === "MAX") {
-      // le shift courant est le dernier element dans sa section
-      // if the current shift is the last one from the section
       if (
+        // if the current shift is the last one from the section
         sectionsState[sectionIdx].indexOf(
           sectionsState[sectionIdx][shiftIdx]
         ) ===
-        sectionsState[sectionIdx].length - 1
-      ) {
+          sectionsState[sectionIdx].length - 1 &&
         // if there is a shift in the next section
-        if (sectionsState[sectionIdx + 1]) {
-          // look at the min of the first shift from the next section and set its min with the sliderState.max + 1
-
-          updateSectionsState(
-            produce(draft => {
-              // update the current
-              draft[sectionIdx][shiftIdx][1] = max;
-            })
-          );
-        }
+        sectionsState[sectionIdx + 1]
+      ) {
+        // look at the min of the first shift from the next section and set its min with the sliderState.max + 1
+        updateSectionsState(
+          produce(draft => {
+            // update the current
+            draft[sectionIdx][shiftIdx][1] = max;
+          })
+        );
       } else {
         // take the shift + 1 from the current section and set its min with the sliderStart.max + 1
-
         updateSectionsState(
           produce(draft => {
             // update the current
@@ -113,28 +108,53 @@ export function Timeline({ duration, sections }: TimelineProps) {
   };
 
   const handlePressAdd = (sectionIdx: number, shiftIdx: number) => {
-    const lastShift = sectionsState[sectionIdx][shiftIdx];
-    console.log("ONPRE ADD", lastShift);
-    const min = lastShift[1];
+    const currentShift = sectionsState[sectionIdx][shiftIdx];
+
+    const nextShift =
+      sectionsState[sectionIdx][shiftIdx + 1] ||
+      (sectionsState[sectionIdx + 1]
+        ? sectionsState[sectionIdx + 1][0]
+        : undefined);
+
+    const min = currentShift[1];
     const max = Math.min(
       sections[sectionIdx].max ?? Infinity,
-      sectionsState[sectionIdx + 1]
-        ? sectionsState[sectionIdx + 1][0][0]
-        : duration
+      nextShift ? nextShift[0] : duration
     );
     const start = Math.round(min + ((max - min) * 0.5) / 2);
     const end = Math.ceil(max - ((max - min) * 0.5) / 2);
 
     updateSectionsState(
       produce(draft => {
-        draft[sectionIdx].push([start, end]);
+        // draft[sectionIdx].splice(shiftIdx + 1, 0, [start, end]);
+        draft[sectionIdx].splice(shiftIdx + 1, 0, [start, end]);
       })
     );
   };
 
+  const sectionsIds = useMemo(() => {
+    const map: Record<string, number> = {};
+    sectionsState.forEach((section, sectionIdx) => {
+      section.forEach((shift, shiftIdx) => {
+        map[`shift_${sectionIdx}_${shiftIdx}`] = Math.floor(
+          Math.random() * 1000
+        );
+      });
+    }, {});
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sectionsState.flat().length]);
+
   useEffect(() => {
     updateSectionsConstraints(getInitialConstraints(sectionsState, duration));
   }, [sectionsState, duration]);
+
+  useEffect(() => {
+    if (onChange) {
+      onChange(sectionsState);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sectionsState]);
 
   return (
     <div className={styles.container}>
@@ -143,39 +163,31 @@ export function Timeline({ duration, sections }: TimelineProps) {
         return section.map(([min, max], shiftIdx) => {
           const currentConstraint = sectionsConstraints[sectionIdx][shiftIdx];
           return (
-            <div
-              className={styles.slider}
-              key={`shift_${sectionIdx}_${shiftIdx}`}
-            >
-              <Slider
-                start={0}
-                end={duration}
-                min={min}
-                max={max}
-                onPressAdd={
-                  shiftIdx === section.length - 1
-                    ? () => handlePressAdd(sectionIdx, shiftIdx)
-                    : null
-                }
-                constraintMin={
-                  currentConstraint
-                    ? Math.max(currentConstraint[0], currentSection.min ?? 0)
-                    : 0
-                }
-                constraintMax={
-                  currentConstraint
-                    ? Math.min(
-                        currentConstraint[1],
-                        currentSection.max ?? Infinity
-                      )
-                    : 0
-                }
-                color={sections[sectionIdx].color}
-                onChange={sliderState =>
-                  onShiftChange(sliderState, sectionIdx, shiftIdx)
-                }
-              />
-            </div>
+            <Slider
+              start={0}
+              end={duration}
+              min={min}
+              max={max}
+              key={sectionsIds[`shift_${sectionIdx}_${shiftIdx}`]}
+              onPressAdd={() => handlePressAdd(sectionIdx, shiftIdx)}
+              constraintMin={
+                currentConstraint
+                  ? Math.max(currentConstraint[0], currentSection.min ?? 0)
+                  : 0
+              }
+              constraintMax={
+                currentConstraint
+                  ? Math.min(
+                      currentConstraint[1],
+                      currentSection.max ?? Infinity
+                    )
+                  : 0
+              }
+              color={sections[sectionIdx].color}
+              onChange={sliderState =>
+                onShiftChange(sliderState, sectionIdx, shiftIdx)
+              }
+            />
           );
         });
       })}
