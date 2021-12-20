@@ -14,9 +14,10 @@ type TimelineProps = {
     max?: number;
     shifts: number[][];
   }[];
+  onChange?: (sections: number[][][]) => void;
 };
 
-export function Timeline({ duration, sections }: TimelineProps) {
+export function Timeline({ duration, sections, onChange }: TimelineProps) {
   const [sectionsState, updateSectionsState] = useState(
     sections.map(s => s.shifts)
   );
@@ -131,10 +132,6 @@ export function Timeline({ duration, sections }: TimelineProps) {
     );
   };
 
-  useEffect(() => {
-    updateSectionsConstraints(getInitialConstraints(sectionsState, duration));
-  }, [sectionsState, duration]);
-
   const sectionsIds = useMemo(() => {
     const map: Record<string, number> = {};
     sectionsState.forEach((section, sectionIdx) => {
@@ -145,9 +142,19 @@ export function Timeline({ duration, sections }: TimelineProps) {
       });
     }, {});
     return map;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sectionsState.flat().length]);
 
+  useEffect(() => {
+    updateSectionsConstraints(getInitialConstraints(sectionsState, duration));
+  }, [sectionsState, duration]);
+
+  useEffect(() => {
+    if (onChange) {
+      onChange(sectionsState);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sectionsState]);
 
   return (
     <div className={styles.container}>
@@ -156,36 +163,31 @@ export function Timeline({ duration, sections }: TimelineProps) {
         return section.map(([min, max], shiftIdx) => {
           const currentConstraint = sectionsConstraints[sectionIdx][shiftIdx];
           return (
-            <div
-              className={styles.slider}
+            <Slider
+              start={0}
+              end={duration}
+              min={min}
+              max={max}
               key={sectionsIds[`shift_${sectionIdx}_${shiftIdx}`]}
-              // key={`shift_${sectionIdx}_${shiftIdx}`}
-            >
-              <Slider
-                start={0}
-                end={duration}
-                min={min}
-                max={max}
-                onPressAdd={() => handlePressAdd(sectionIdx, shiftIdx)}
-                constraintMin={
-                  currentConstraint
-                    ? Math.max(currentConstraint[0], currentSection.min ?? 0)
-                    : 0
-                }
-                constraintMax={
-                  currentConstraint
-                    ? Math.min(
-                        currentConstraint[1],
-                        currentSection.max ?? Infinity
-                      )
-                    : 0
-                }
-                color={sections[sectionIdx].color}
-                onChange={sliderState =>
-                  onShiftChange(sliderState, sectionIdx, shiftIdx)
-                }
-              />
-            </div>
+              onPressAdd={() => handlePressAdd(sectionIdx, shiftIdx)}
+              constraintMin={
+                currentConstraint
+                  ? Math.max(currentConstraint[0], currentSection.min ?? 0)
+                  : 0
+              }
+              constraintMax={
+                currentConstraint
+                  ? Math.min(
+                      currentConstraint[1],
+                      currentSection.max ?? Infinity
+                    )
+                  : 0
+              }
+              color={sections[sectionIdx].color}
+              onChange={sliderState =>
+                onShiftChange(sliderState, sectionIdx, shiftIdx)
+              }
+            />
           );
         });
       })}

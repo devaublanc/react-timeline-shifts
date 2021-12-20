@@ -119,13 +119,13 @@ export function Slider({
             width: `${maxPercent - minPercent}%`,
           }}
         >
-          <div className={styles.valueStart}>
+          {/* <div className={styles.valueStart}>
             {state.min} (min: {constraintMin})
           </div>
 
           <div className={styles.valueEnd}>
             {state.max} max: ({constraintMax})
-          </div>
+          </div> */}
           {onPressAdd && state.max < constraintMax && (
             <div className={styles.addRangeBtn} onClick={onPressAdd} />
           )}

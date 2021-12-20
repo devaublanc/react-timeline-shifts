@@ -7,7 +7,7 @@ type WeekProps = {
   children: ReactElement;
 };
 
-const days = [
+export const days = [
   "Lundi",
   "Mardi",
   "Mercredi",
@@ -41,7 +41,7 @@ export function Week({ lang, children }: WeekProps) {
               >
                 12h00
               </div>
-              {Array.from(Array(12), (e, i) => (
+              {Array.from(Array(24), (e, i) => (
                 <div className={styles.hour} key={`hour_${i}`} />
               ))}
             </div>
