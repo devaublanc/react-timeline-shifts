@@ -4,6 +4,60 @@ import "./App.css";
 import { Week } from "./Week";
 import { Openings } from "./Openings";
 
+const initialSections = [
+  {
+    name: "lundi",
+    color: "#FFBE0B",
+    min: 0,
+    max: 2159,
+    shifts: [
+      [480, 1080], // il peut aller de 0 à 199
+    ],
+  },
+  {
+    name: "mardi",
+    color: "#FB5607",
+    min: 1440,
+    max: 3599,
+    shifts: [[2000, 2800]],
+  },
+  {
+    name: "mercredi",
+    color: "#8338EC",
+    min: 2880,
+    max: 5039,
+    shifts: [[3300, 4000]],
+  },
+  {
+    name: "jeudi",
+    color: "#FF006E",
+    min: 4320,
+    max: 6479,
+    shifts: [[4500, 5000]],
+  },
+  {
+    name: "vendredi",
+    color: "#3A0CA3",
+    min: 5760,
+    max: 7919,
+    shifts: [[6000, 7000]],
+  },
+  {
+    name: "samedi",
+    color: "#70e000",
+    min: 7200,
+    max: 9359,
+    shifts: [[7500, 8300]],
+  },
+  {
+    name: "dimanche",
+    color: "#4CC9F0",
+    min: 8640,
+    max: 10799,
+    shifts: [[9000, 9800]],
+  },
+];
+
 function App() {
   const [sections, setSections] = useState<number[][][]>([]);
   return (
@@ -20,81 +74,7 @@ function App() {
         <Timeline
           duration={10080}
           onChange={setSections}
-          sections={[
-            {
-              name: "lundi",
-              color: "red",
-              min: 0,
-              max: 2159,
-              shifts: [
-                [480, 1080], // il peut aller de 0 à 199
-                // [1500, 1800], // il peut aller de 101 à 399
-              ],
-            },
-            {
-              name: "mardi",
-              color: "blue",
-              min: 1440,
-              max: 3599,
-              shifts: [
-                [2000, 2800],
-              ],
-            },
-            {
-              name: "mercredi",
-              color: "green",
-              min: 2880,
-              max: 5039,
-              shifts: [
-                [3300, 4000],
-              ],
-            },
-            {
-              name: "jeudi",
-              color: "yellow",
-              min: 4320,
-              max: 6479,
-              shifts: [
-                [4500, 5000],
-              ],
-            },
-            {
-              name: "vendredi",
-              color: "purple",
-              min: 5760,
-              max: 7919,
-              shifts: [
-                [6000, 7000],
-              ],
-            },
-            {
-              name: "samedi",
-              color: "pink",
-              min: 7200,
-              max: 9359,
-              shifts: [
-                [7500, 8300],
-              ],
-            },
-            {
-              name: "dimanche",
-              color: "orange",
-              min: 8640,
-              max: 10799,
-              shifts: [
-                [9000, 9800],
-              ],
-            },
-            // {
-            //   name: "vendredi",
-            //   color: "purple",
-            //   min: 4320,
-            //   max: 6479,
-            //   shifts: [
-            //     [4500, 5000],
-            //   ],
-            // },
-          ]}
+          sections={initialSections}
           // sections={[
           //   {
           //     name: "lundi",

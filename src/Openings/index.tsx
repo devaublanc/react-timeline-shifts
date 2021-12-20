@@ -56,8 +56,8 @@ export function Openings({ sections }: OpeningsProps) {
               {section.map((shift, shiftIdx) => {
                 return (
                   <div className={styles.hours} key={`shift_${shiftIdx}`}>
-                    {format(getDateFromMinutes(shift[0]), "HH:mm a")}-{" "}
-                    {format(getDateFromMinutes(shift[1]), "HH:mm a")}
+                    {format(getDateFromMinutes(shift[0]), "HH:mm")} -{" "}
+                    {format(getDateFromMinutes(shift[1]), "HH:mm")}
                   </div>
                 );
               })}
